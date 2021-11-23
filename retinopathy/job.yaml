@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ingest-retinopathy
+spec:
+  template:
+    spec:
+      containers:
+        - name: main
+          image: eu.gcr.io/dev-infra-282913/ingest_retinopathy:21
+          env:
+            - name: RAYMON_ENDPOINT
+              value: https://api.raymon.ai/v0
+            - name: PROJECT_ID
+              value: 6b71c2eb-5800-4af8-b7ec-ff26db0fa137
+            - name: RAYMON_CLIENT_SECRET_FILE
+              value: /etc/secrets/m2mcreds-retinopathy.json
+            - name: LOG_PATH
+              value: /var/log/raymon
+            - name: RAYMON_N_RAYS
+              value: "6000"
+            - name: ENV
+              value: ""
+            - name: PYTHONUNBUFFERED
+              value: "1"
+          volumeMounts:
+            - name: project-secret
+              mountPath: /etc/secrets
+
+      volumes:
+        - name: project-secret
+          secret:
+            secretName: retinopathy-secret
+
+      restartPolicy: Never
+
+  backoffLimit: 1

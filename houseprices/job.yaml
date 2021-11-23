@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ingest-houseprices
+spec:
+  template:
+    spec:
+      containers:
+        - name: main
+          image: eu.gcr.io/dev-infra-282913/ingest_houses:17
+          env:
+            - name: RAYMON_ENDPOINT
+              value: https://api.raymon.ai/v0
+            - name: PROJECT_ID
+              value: aae3ee0f-4e97-4640-859c-6a39c0915d2b
+            - name: RAYMON_CLIENT_SECRET_FILE
+              value: /etc/secrets/m2mcreds-houseprices.json
+            - name: LOG_PATH
+              value: /var/log/raymon/
+            - name: RAYMON_N_RAYS
+              value: "5000"
+            - name: ENV
+              value: ""
+            - name: PYTHONUNBUFFERED
+              value: "1"
+          volumeMounts:
+            - name: project-secret
+              mountPath: /etc/secrets
+      volumes:
+        - name: project-secret
+          secret:
+            secretName: houseprices-secret
+
+      restartPolicy: Never
+
+  backoffLimit: 1

@@ -1,0 +1,34 @@
+---
+project_id: house_prices
+version: draft
+settings:
+  reducer_interval_s: 120 # 10 min
+actions:
+  map:
+    - name: profile_eval
+      mapper_type: profile_eval
+      profile: housepricescheap@3.0.0
+      inputs:
+        output: pricing_prediction # Ref
+        actual: actual
+  visualize: # On demand
+    - name: request_data
+      function: pandas2html
+      inputs:
+        data: request_data
+      params: null
+    - name: preprocessed_input
+      function: pandas2html
+      inputs:
+        data: preprocessed_input
+      params: null
+  reduce:
+    - reducer_type: profile_reducer
+      name: housepricescheap@3.0.0
+
+slices:
+  - space:
+      - tag: client
+  - space:
+      - tag: client
+      - tag: app

@@ -1,0 +1,26 @@
+version: "3.7"
+services:
+  house_ingest:
+    image: eu.gcr.io/dev-infra-282913/ingest_houses:17
+    build:
+      context: .
+      args:
+        PIP_INDEX_URL: https://${FURY_DEPLOY_AUTH}:@pypi.fury.io/raymon/
+        PIP_TRUSTED_HOST: "pypi.orgfiles.pythonhosted.org download.pytorch.org"
+        PIP_EXTRA_INDEX_URL: https://pypi.org/simple/
+    environment:
+      RAYMON_ENDPOINT: https://api.raymon.ai/v0  # http://host.docker.internal:5000/v0 ## "http://api.staging.raymon.ai/v0"
+      PROJECT_ID: aae3ee0f-4e97-4640-859c-6a39c0915d2b
+      RAYMON_CLIENT_SECRET_FILE: /run/secrets/m2mcreds-houseprices.json
+      RAYMON_N_RAYS: 10
+      LOG_PATH: "/var/log/"
+
+    volumes:
+      # We should really use secrets for this, but this is easier to run since it allows to run using docker-compose. See comments below for secrets.
+      - ./m2mcreds-houseprices.json:/run/secrets/m2mcreds-houseprices.json
+#     secrets:
+#       - m2mcreds.json
+
+# secrets:
+#   m2mcreds.json:
+#     file: m2mcreds.json

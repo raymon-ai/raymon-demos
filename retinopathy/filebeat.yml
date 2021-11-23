@@ -1,0 +1,21 @@
+filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/raymon/raymon.log*
+    scan_frequency: 5s
+
+output.kafka:
+  # initial brokers for reading cluster metadata
+  hosts: ["host.docker.internal:9094"]
+
+  # message topic selection + partitioning
+  topic: landingstrip-topic # "%{[fields.log_topic]}"
+  key: "to-edit"
+  partition.round_robin:
+    reachable_only: false
+
+  required_acks: 1
+  compression: gzip
+  max_message_bytes: 14000000
+# filebeat -c filebeat.yml -v -e -d "*" run 2>&1 | tee /tmp/logs.txt

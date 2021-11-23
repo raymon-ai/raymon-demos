@@ -1,0 +1,26 @@
+---
+project_id: retinopathy
+version: draft
+actions:
+  visualize: # On demand
+    - name: show_request_data
+      function: img2html
+      inputs:
+        data: request_data # Peephole name
+      params: null
+      # ...
+  map: # Executed whenever input are available
+    - name: model_abs_error
+      function: abs_err
+      type: metric
+      inputs:
+        pred: model_prediction # Peephole name
+        gt: actual # Peephole name
+    - name: model_class_error
+      function: class_error_type
+      type: metric
+      inputs:
+        pred: model_prediction # Peephole name
+        gt: actual # Peephole name
+      params:
+        pos: 0
