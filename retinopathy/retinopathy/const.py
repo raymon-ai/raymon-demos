@@ -26,6 +26,8 @@ TAG_CHOICES = {
 }
 BAD_MACHINE = TAG_CHOICES["machine_id"]["UZA"][0]
 ROOT = Path("..").resolve()
+LABELPATH = ROOT / "data/trainLabels.csv"
+
 SECRET = Path(
     os.environ.get("RAYMON_CLIENT_SECRET_FILE", ROOT / "m2mcreds-retinopathy.json")
 )

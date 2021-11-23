@@ -2,35 +2,11 @@ import pandas as pd
 import random
 
 
-class ModelOracle:
-    def __init__(self, labelpath):
-        self.labels = pd.read_csv(labelpath)
-
-    def get_src(self, metadata):
-        for tag in metadata:
-            if tag["name"] == "srcfile":
-                return tag["value"]
-
-    def get_target(self, metadata):
-        srcfile = self.get_src(metadata)
-        return int(self.labels.loc[self.labels["image"] == srcfile, "level"].values[0])
-
-
 class RetinopathyMockModel:
-    def __init__(self, oracle, bad_machines):
+    def __init__(self, oracle):
         self.oracle = oracle
-        self.bad_machines = bad_machines
 
-    def get_machine(self, metadata):
-        for tag in metadata:
-            if tag["name"] == "machine_id":
-                return tag["value"]
-
-    def predict(self, data, metadata):
-        if self.get_machine(metadata) in self.bad_machines:
-            p_corr = 0.2
-        else:
-            p_corr = 0.95
+    def predict(self, data, metadata, p_corr):
         iscorr = random.random() <= p_corr
         target = self.oracle.get_target(metadata)
         if iscorr:
@@ -43,3 +19,17 @@ class RetinopathyMockModel:
 
     def train(self, data):
         pass
+
+
+class ModelOracle:
+    def __init__(self, labelpath):
+        self.labels = pd.read_csv(labelpath)
+
+    def get_src(self, metadata):
+        for tag in metadata:
+            if tag["name"] == "srcfile":
+                return tag["value"]
+
+    def get_target(self, metadata):
+        srcfile = self.get_src(metadata)
+        return int(self.labels.loc[self.labels["image"] == srcfile, "level"].values[0])
