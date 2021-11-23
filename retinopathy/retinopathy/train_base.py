@@ -55,7 +55,28 @@ def load_data(dpath, lim):
     return images, metadata
 
 
+def get_preds_actuals(metadata, loaded_data):
+    oracle = ModelOracle(labelpath=LABELPATH)
+    model = RetinopathyMockModel(oracle=oracle, bad_machines=[])
+    model.train(loaded_data)
+
+    preds = []
+    for meta, img in zip(metadata, loaded_data):
+        pred = model.predict(data=img, metadata=meta)
+        preds.append([pred])
+    targets = []
+    for meta in metadata:
+        target = model.oracle.get_target(metadata=meta)
+        targets.append([target])
+    return preds, targets
+
+
 # %%
+
+
+loaded_data, metadata = load_data(dpath=DATA_PATH, lim=LIM)
+preds, targets = get_preds_actuals(metadata, loaded_data)
+
 profile = ModelProfile(
     name="retinopathy",
     version="3.0.0",
@@ -78,55 +99,10 @@ profile = ModelProfile(
         OutputComponent(
             "model_prediction", extractor=ElementExtractor(0), dtype=DataType.INT
         ),
-        ActualComponent(
-            "model_actual", extractor=ElementExtractor(0), dtype=DataType.INT
-        ),
-        EvalComponent(
-            "regression_error",
-            extractor=AbsoluteRegressionError(),
-            dtype=DataType.FLOAT,
-        ),
-        EvalComponent(
-            "classification_error",
-            extractor=ClassificationErrorType(positive=0),
-            dtype=DataType.CAT,
-        ),
-    ],
-    scores=[
-        MeanScore(
-            name="mean_absolute_error",
-            inputs=["regression_error"],
-            preference="low",
-        ),
-        PrecisionScore(
-            name="precision",
-            inputs=["classification_error"],
-        ),
-        RecallScore(
-            name="recall",
-            inputs=["classification_error"],
-        ),
     ],
 )
 
 
-loaded_data, metadata = load_data(dpath=DATA_PATH, lim=LIM)
-#%%
-
-oracle = ModelOracle(labelpath=LABELPATH)
-model = RetinopathyMockModel(oracle=oracle, bad_machines=[])
-model.train(loaded_data)
-
-preds = []
-for meta, img in zip(metadata, loaded_data):
-    pred = model.predict(data=img, metadata=meta)
-    preds.append([pred])
-targets = []
-for meta in metadata:
-    target = model.oracle.get_target(metadata=meta)
-    targets.append([target])
-
-profile.build(input=loaded_data, output=preds, actual=targets, silent=False)
-fullprofile_path = Path("../models/")
+profile.build(input=loaded_data, output=preds, actual=None, silent=False)
 profile.view()
-profile.save(fullprofile_path)
+profile.save(".")
