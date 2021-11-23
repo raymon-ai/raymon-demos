@@ -6,7 +6,7 @@ class RetinopathyMockModel:
     def __init__(self, oracle):
         self.oracle = oracle
 
-    def predict(self, data, metadata, p_corr):
+    def predict(self, data, metadata, p_corr=0.95):
         iscorr = random.random() <= p_corr
         target = self.oracle.get_target(metadata)
         if iscorr:

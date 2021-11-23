@@ -65,6 +65,27 @@ class RetinopathyDeployment:
             trace.logger.flush()
 
 
+class FeedbackDeployment:
+    def __init__(self, model_oracle):
+        self.raymon = RaymonAPILogger(
+            url=RAYMON_URL,
+            project_id=PROJECT_ID,
+            auth_path=SECRET,
+            batch_size=20,
+        )
+        self.model_oracle = model_oracle
+        self.profile = profile
+
+    def process(self, trace_id, metadata):
+        trace = Trace(logger=self.raymon, trace_id=str(trace_id))
+        trace.info(f"Logging ground truth for {trace}")
+        target = self.model_oracle.get_target(metadata)
+        trace.log(ref="actual", data=rt.Native(target))
+        trace.tag(profile.validate_actual(actual=[target]))
+        trace.logger.flush()
+        return target
+
+
 def pick_tags(TAG_CHOICES):
     tags = []
     for key in ["age", "hospital", "eye"]:
@@ -84,6 +105,7 @@ def get_machine(metadata):
 
 def run():
     # Create a client, fetch data and send it to the deployment
+    trace_ids = []
     for i in range(N_RAYS):
         trace_id = str(uuid.uuid4())
         metadata = pick_tags(TAG_CHOICES)
@@ -100,6 +122,9 @@ def run():
         pred = deployment.process(
             trace_id=trace_id, data=img, metadata=metadata, p_corr=p_corr
         )
+        actual = oracle.process(trace_id=trace_id, metadata=metadata)
+        trace_ids.append(trace_id)
+    return trace_ids
 
 
 #%%
@@ -111,6 +136,7 @@ files = list((ROOT / "data/1").glob("*.jpeg"))
 profile = ModelProfile().load(f"../models/{VERSION}.json")
 model_oracle = ModelOracle(labelpath=LABELPATH)
 model = RetinopathyMockModel(oracle=model_oracle, BAD_MACHINEs=[BAD_MACHINE])
+oracle = FeedbackDeployment(model_oracle=model_oracle)
 deployment = RetinopathyDeployment(version=VERSION, model=model, profile=profile)
 
 

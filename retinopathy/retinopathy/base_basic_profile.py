@@ -9,6 +9,7 @@ from PIL import Image
 
 from raymon import Trace, RaymonAPILogger
 from raymon import types as rt
+from raymon import ModelProfile
 
 
 from models import ModelOracle, RetinopathyMockModel
@@ -16,7 +17,7 @@ from const import TAG_CHOICES, BAD_MACHINE, ROOT, SECRET, LABELPATH
 
 
 class RetinopathyDeployment:
-    def __init__(self, version, model):
+    def __init__(self, version, model, profile):
         self.version = version
         self.model = model
         self.raymon = RaymonAPILogger(
@@ -24,16 +25,20 @@ class RetinopathyDeployment:
             project_id=PROJECT_ID,
             batch_size=20,
         )
+        self.profile = profile
 
     def process(self, trace_id, data, metadata, p_corr):
         trace = Trace(logger=self.raymon, trace_id=trace_id)
         trace.tag(metadata)
         try:
             trace.log(ref="request_data", data=rt.Image(data))
+            tags = self.profile.validate_input(data)
+            trace.tag(tags)
             resized_img = data.resize((512, 512))
             trace.log(ref="resized_data", data=rt.Image(resized_img))
             pred = self.model.predict(resized_img, metadata, p_corr=p_corr)
             print(f"Processed trace {trace_id}. Prediction: {pred}")
+            trace.tag(self.profile.validate_output([pred]))
             return pred
         except Exception as exc:
             print(traceback.format_exc())
@@ -85,7 +90,9 @@ RAYMON_URL = "https://api.raymon.ai/v0"
 files = list((ROOT / "data/1").glob("*.jpeg"))
 model_oracle = ModelOracle(labelpath=LABELPATH)
 model = RetinopathyMockModel(oracle=model_oracle)
-deployment = RetinopathyDeployment(version=VERSION, model=model)
+profile = ModelProfile().load(f"../models/{VERSION}.json")
+
+deployment = RetinopathyDeployment(version=VERSION, model=model, profile=profile)
 
 
 start_ts = pendulum.now()

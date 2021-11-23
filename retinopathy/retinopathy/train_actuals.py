@@ -99,10 +99,39 @@ profile = ModelProfile(
         OutputComponent(
             "model_prediction", extractor=ElementExtractor(0), dtype=DataType.INT
         ),
+        ActualComponent(
+            "model_actual", extractor=ElementExtractor(0), dtype=DataType.INT
+        ),
+        EvalComponent(
+            "regression_error",
+            extractor=AbsoluteRegressionError(),
+            dtype=DataType.FLOAT,
+        ),
+        EvalComponent(
+            "classification_error",
+            extractor=ClassificationErrorType(positive=0),
+            dtype=DataType.CAT,
+        ),
+    ],
+    scores=[
+        MeanScore(
+            name="mean_absolute_error",
+            inputs=["regression_error"],
+            preference="low",
+        ),
+        PrecisionScore(
+            name="precision",
+            inputs=["classification_error"],
+        ),
+        RecallScore(
+            name="recall",
+            inputs=["classification_error"],
+        ),
     ],
 )
 
 
-profile.build(input=loaded_data, output=preds, actual=None, silent=False)
+profile.build(input=loaded_data, output=preds, actual=targets, silent=False)
 profile.view()
-profile.save(".")
+# profile.save(".")
+#%%
