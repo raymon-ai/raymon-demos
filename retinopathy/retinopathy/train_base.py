@@ -36,7 +36,6 @@ from PIL import ImageEnhance
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 ROOT = Path("..").resolve()
 LABELPATH = ROOT / "data/trainLabels.csv"
-
 DATA_PATH = Path("../data/1/")
 LIM = 500
 
@@ -57,8 +56,6 @@ def load_data(dpath, lim):
 
 
 # %%
-
-
 profile = ModelProfile(
     name="retinopathy",
     version="3.0.0",
@@ -114,7 +111,6 @@ profile = ModelProfile(
 
 
 loaded_data, metadata = load_data(dpath=DATA_PATH, lim=LIM)
-
 #%%
 
 oracle = ModelOracle(labelpath=LABELPATH)
@@ -125,45 +121,12 @@ preds = []
 for meta, img in zip(metadata, loaded_data):
     pred = model.predict(data=img, metadata=meta)
     preds.append([pred])
-# preds = np.array(preds)[:, None]
 targets = []
 for meta in metadata:
     target = model.oracle.get_target(metadata=meta)
     targets.append([target])
-# targets = np.array(targets)[:, None]
-# loaded_data = load_data(dpath=DATA_PATH, lim=LIM)
+
 profile.build(input=loaded_data, output=preds, actual=targets, silent=False)
 fullprofile_path = Path("../models/")
 profile.view()
 profile.save(fullprofile_path)
-
-#%%
-
-profile = ModelProfile().load(fullprofile_path / f"{profile.group_idfr}.json")
-tags = profile.validate_input(loaded_data[-1], tag_format="tag")
-tags
-
-#%%
-imgpick = loaded_data[-1]
-# %%
-img_blur = imgpick.copy().filter(ImageFilter.GaussianBlur(radius=3))
-img_blur
-#%%
-tags = profile.validate_input(img_blur, tag_format="tag")
-tags
-# %%
-# image brightness enhancer
-enhancer = ImageEnhance.Brightness(imgpick)
-factor = 0.3  # darkens the image 1 = original
-img_dark = enhancer.enhance(factor)
-# im_output.save('darkened-image.png')#%%
-profile.validate_input(img_dark)
-
-#%%
-#  For each pixel (x, y), the output will be calculated as (ax+by+c, dx+ey+f)
-img_shift = imgpick.transform(imgpick.size, Image.AFFINE, (1, 0, 500, 0, 1, 0))
-profile.validate_input(img_shift)
-# profile.view(poi=img_shift)
-# %%
-
-# %%

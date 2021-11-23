@@ -86,7 +86,7 @@ def load_orch(fpath):
     return cfg
 
 
-cfg = load_orch(ROOT / "manifest.yml")
+cfg = load_orch(ROOT / "manifest.yaml")
 resp = api.orchestration_apply(project_id=project_id, cfg=cfg)
 resp
 # %%

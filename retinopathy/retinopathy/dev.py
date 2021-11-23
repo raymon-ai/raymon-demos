@@ -18,3 +18,14 @@ model = RetinopathyMockModel(oracle=oracle)
 model.predict(data=img, metadata=metadata, p_corr=0.95)
 oracle.get_target(metadata=metadata)
 # %%
+from raymon import RaymonAPI
+
+with open("../manifest.yaml", "r") as f:
+    cfg = f.read()
+api = RaymonAPI(url=f"https://api.raymon.ai/v0")
+resp = api.orchestration_apply(
+    project_id="4854ecdf-725e-4627-8600-4dadf1588072", cfg=cfg
+)
+resp
+
+# %%
