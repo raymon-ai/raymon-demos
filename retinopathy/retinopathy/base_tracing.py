@@ -77,7 +77,7 @@ def run():
 
 
 #%%
-N_RAYS = int(os.environ.get("RAYMON_N_RAYS", 50))
+N_RAYS = int(os.environ.get("RAYMON_N_TRACES", 50))
 VERSION = "retinopathy@3.0.0"
 PROJECT_ID = "4854ecdf-725e-4627-8600-4dadf1588072"
 RAYMON_URL = "https://api.raymon.ai/v0"

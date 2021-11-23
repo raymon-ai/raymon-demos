@@ -58,7 +58,7 @@ def run():
 
 
 #%%
-N_RAYS = int(os.environ.get("RAYMON_N_RAYS", 100))
+N_RAYS = int(os.environ.get("RAYMON_N_TRACES", 100))
 VERSION = "retinopathy@3.0.0"
 
 files = list((ROOT / "data/1").glob("*.jpeg"))

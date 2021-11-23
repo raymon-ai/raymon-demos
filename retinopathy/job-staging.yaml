@@ -17,7 +17,7 @@ spec:
               value: /etc/secrets/m2mcreds-retinopathy.staging.json
             - name: LOG_PATH
               value: /var/log/raymon
-            - name: RAYMON_N_RAYS
+            - name: RAYMON_N_TRACES
               value: "6000"
             - name: ENV
               value: staging

@@ -22,12 +22,16 @@ from houseprices.io import load_data
 
 ROOT = Path("..")
 ENV = os.environ.get("ENV", ".dev")
-N_RAYS = int(os.environ.get("RAYMON_N_RAYS", 1000))
+N_RAYS = int(os.environ.get("RAYMON_N_TRACES", 1000))
 PROJECT_ID = os.environ.get("PROJECT_ID", "cc025a4a-8189-4bd7-92ae-5a0b6f9d6840")
 RAYMON_URL = os.environ.get(
     "RAYMON_ENDPOINT", "http://localhost:15000/v0"
 )  # "https://api.raymon.ai/v0"  # "http://localhost:5000/v0")
-SECRET = Path(os.environ.get("RAYMON_CLIENT_SECRET_FILE", ROOT / f"m2mcreds-houseprices{ENV}.json")).resolve()
+SECRET = Path(
+    os.environ.get(
+        "RAYMON_CLIENT_SECRET_FILE", ROOT / f"m2mcreds-houseprices{ENV}.json"
+    )
+).resolve()
 
 # Only for local developer runs
 if "dev" in ENV:
@@ -139,7 +143,11 @@ class ClientRemax:
         else:
             print(f"During switch")
             # User are switching linearly between switch begin and switch end.
-            p_switched = 1 / (self.switch_end - self.switch_begin) * (self.idx - self.switch_begin)
+            p_switched = (
+                1
+                / (self.switch_end - self.switch_begin)
+                * (self.idx - self.switch_begin)
+            )
             if random.random() >= p_switched:
                 print(f"Old app.")
                 return self.send_data_oldapp()
@@ -264,7 +272,9 @@ def run_process():
     split = int((1 - ratio_remax) * len(X))
     switch_begin = int((ratio_remax) * N_RAYS * 0.3)
     switch_end = int((ratio_remax) * N_RAYS * 0.7)
-    print(f"Client remax will start switching at: {switch_begin}, end at: {switch_end} out")
+    print(
+        f"Client remax will start switching at: {switch_begin}, end at: {switch_end} out"
+    )
 
     X_kwr = X.iloc[:split, :]
     X_remax = X.iloc[split:, :]
@@ -284,7 +294,9 @@ def run_process():
     client_zillow = ClientZillow(
         df=X_zillow,
     )
-    client_remax = ClientRemax(df=X_remax, switch_begin=switch_begin, switch_end=switch_end)
+    client_remax = ClientRemax(
+        df=X_remax, switch_begin=switch_begin, switch_end=switch_end
+    )
 
     # Create a client, fetch data and send it to the deployment
     trace_ids = []

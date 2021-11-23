@@ -12,7 +12,7 @@ services:
       RAYMON_ENDPOINT: https://api.raymon.ai/v0  # http://host.docker.internal:5000/v0 ## "http://api.staging.raymon.ai/v0"
       PROJECT_ID: aae3ee0f-4e97-4640-859c-6a39c0915d2b
       RAYMON_CLIENT_SECRET_FILE: /run/secrets/m2mcreds-houseprices.json
-      RAYMON_N_RAYS: 10
+      RAYMON_N_TRACES: 10
       LOG_PATH: "/var/log/"
 
     volumes:

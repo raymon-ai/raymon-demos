@@ -11,13 +11,9 @@ from raymon import types as rt
 from raymon import ModelProfile
 from PIL import ImageFilter
 
-from .models import ModelOracle, RetinopathyMockModel
-from .const import TAG_CHOICES, BAD_MACHINE, ROOT, SECRET, LABELPATH
+from models import ModelOracle, RetinopathyMockModel
+from const import TAG_CHOICES, BAD_MACHINE, ROOT, SECRET, LABELPATH
 
-N_RAYS = int(os.environ.get("RAYMON_N_RAYS", 100))
-PROJECT_ID = os.environ.get("PROJECT_ID", "c14005c0-c57d-492c-8339-53cc694cb743")
-RAYMON_URL = os.environ.get("RAYMON_ENDPOINT", "https://api.raymon.ai/v0/")
-VERSION = "retinopathy@3.0.0"
 
 #%%
 class RetinopathyDeployment:
@@ -78,7 +74,6 @@ class FeedbackDeployment:
 
     def process(self, trace_id, metadata):
         trace = Trace(logger=self.raymon, trace_id=str(trace_id))
-        trace.info(f"Logging ground truth for {trace}")
         target = self.model_oracle.get_target(metadata)
         trace.log(ref="actual", data=rt.Native(target))
         trace.tag(profile.validate_actual(actual=[target]))
@@ -128,6 +123,11 @@ def run():
 
 
 #%%
+N_RAYS = int(os.environ.get("RAYMON_N_TRACES", 2000))
+VERSION = "retinopathy@3.0.0"
+PROJECT_ID = "4854ecdf-725e-4627-8600-4dadf1588072"
+RAYMON_URL = "https://api.raymon.ai/v0"
+
 print(f"Running for project id: {PROJECT_ID}")
 print(f"Using endpoint: {RAYMON_URL}")
 print(f"Secret path: {SECRET}, exists? {SECRET.exists()}")
@@ -135,7 +135,7 @@ print(f"Secret path: {SECRET}, exists? {SECRET.exists()}")
 files = list((ROOT / "data/1").glob("*.jpeg"))
 profile = ModelProfile().load(f"../models/{VERSION}.json")
 model_oracle = ModelOracle(labelpath=LABELPATH)
-model = RetinopathyMockModel(oracle=model_oracle, BAD_MACHINEs=[BAD_MACHINE])
+model = RetinopathyMockModel(oracle=model_oracle)
 oracle = FeedbackDeployment(model_oracle=model_oracle)
 deployment = RetinopathyDeployment(version=VERSION, model=model, profile=profile)
 
@@ -144,3 +144,4 @@ start_ts = pendulum.now()
 trace_ids = run()
 end_ts = pendulum.now()
 print(f"Start: {str(start_ts.in_tz('utc'))}, End: {str(end_ts.in_tz('utc'))}")
+#%%

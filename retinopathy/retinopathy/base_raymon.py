@@ -14,7 +14,7 @@ from PIL import ImageFilter
 from .models import ModelOracle, RetinopathyMockModel
 from .const import TAG_CHOICES, BAD_MACHINE, ROOT, SECRET, LABELPATH
 
-N_RAYS = int(os.environ.get("RAYMON_N_RAYS", 100))
+N_RAYS = int(os.environ.get("RAYMON_N_TRACES", 100))
 PROJECT_ID = os.environ.get("PROJECT_ID", "c14005c0-c57d-492c-8339-53cc694cb743")
 RAYMON_URL = os.environ.get("RAYMON_ENDPOINT", "https://api.raymon.ai/v0/")
 VERSION = "retinopathy@3.0.0"

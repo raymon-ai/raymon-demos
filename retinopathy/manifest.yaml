@@ -7,22 +7,10 @@ actions:
       function: img2html
       inputs:
         data: request_data
-      params: null
     - name: show_resized_data
       function: img2html
       inputs:
         data: resized_data
-      params: null
-    - name: show_pred
-      function: native2html
-      inputs:
-        data: model_prediction
-      params: null
-    - name: show_actual
-      function: native2html
-      inputs:
-        data: actual #
-      params: null
 
   reduce:
     - reducer_type: profile_reducer

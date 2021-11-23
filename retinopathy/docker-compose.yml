@@ -23,7 +23,7 @@ services:
       RAYMON_ENDPOINT: "https://api.raymon.ai/v0"
       PROJECT_ID: 6b71c2eb-5800-4af8-b7ec-ff26db0fa137
       RAYMON_CLIENT_SECRET_FILE: /run/secrets/m2mcreds-retinopathy.json
-      RAYMON_N_RAYS: 10
+      RAYMON_N_TRACES: 10
       LOG_PATH: "/var/log/raymon/"
 #     secrets:
 #       - m2mcreds-retinopathy.json

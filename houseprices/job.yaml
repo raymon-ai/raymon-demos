@@ -17,7 +17,7 @@ spec:
               value: /etc/secrets/m2mcreds-houseprices.json
             - name: LOG_PATH
               value: /var/log/raymon/
-            - name: RAYMON_N_RAYS
+            - name: RAYMON_N_TRACES
               value: "5000"
             - name: ENV
               value: ""

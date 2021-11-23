@@ -29,3 +29,15 @@ resp = api.orchestration_apply(
 resp
 
 # %%
+from raymon import ModelProfile
+from raymon import RaymonAPI
+
+api = RaymonAPI(url=f"https://api.raymon.ai/v0")
+
+schema = ModelProfile.load(ROOT / f"models/retinopathy@3.0.0.json")
+resp = api.profile_create(
+    project_id="4854ecdf-725e-4627-8600-4dadf1588072", profile=schema
+)
+resp.json()
+
+# %%

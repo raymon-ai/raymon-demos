@@ -22,7 +22,7 @@ from retinopathy.models import ModelOracle, RetinopathyMockModel
 
 
 ROOT = Path("..").resolve()
-N_RAYS = int(os.environ.get("RAYMON_N_RAYS", 100))
+N_RAYS = int(os.environ.get("RAYMON_N_TRACES", 100))
 PROJECT_ID = os.environ.get("PROJECT_ID", "c14005c0-c57d-492c-8339-53cc694cb743")
 RAYMON_URL = os.environ.get("RAYMON_ENDPOINT", "http://localhost:15000/v0")
 ENV = os.environ.get("ENV", "dev")
